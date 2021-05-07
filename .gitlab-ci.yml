@@ -1,0 +1,54 @@
+image: python:latest
+
+before_script:
+  - python -V
+
+stages:
+  - badges
+  - style
+  - test
+
+docs:
+  stage: badges
+  before_script:
+    - pip install anybadge
+  script:
+    - mkdir public
+    - anybadge --label=docs --value=passing --file=public/docs.svg passing=green
+  artifacts:
+    paths:
+      - public/docs.svg
+
+pep8:
+  stage: style
+  before_script:
+    - pip install -r ci/pycodestyle_requirements.txt
+  script:
+    - ./ci/pycodestyle_runner.sh
+  artifacts:
+    paths:
+      - public/pycodestyle.txt
+      - public/pycodestyle.svg
+
+pylint:
+  stage: style
+  before_script:
+    - pip install -r requirements.txt
+    - pip install -r ci/pylint_requirements.txt
+  script:
+    - ./ci/pylint_runner.sh
+  artifacts:
+    paths:
+      - public/pylint.svg
+      - public/pylint.html
+
+api_test:
+  stage: test
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - ./ci/api_test.sh
+  artifacts:
+    paths:
+      - public/api_test.svg
+      - public/api_test.txt
